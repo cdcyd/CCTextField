@@ -323,6 +323,7 @@
 				D95DB8E51F668C9900D58183 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
