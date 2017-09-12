@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "CCTextField"
-  s.version      = "1.1.0"
+  s.version      = "1.1.1"
   s.summary      = "Custom UITextField."
 
   # This description is used to generate tags and improve search results.
@@ -81,7 +81,7 @@ Pod::Spec.new do |s|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "https://github.com/cdcyd/CCTextField.git", :tag => "v1.1.0" }
+  s.source = { :git => "https://github.com/cdcyd/CCTextField.git", :tag => s.version }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
