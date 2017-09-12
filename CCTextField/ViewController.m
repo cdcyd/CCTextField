@@ -2,7 +2,7 @@
 //  ViewController.m
 //  CCTextField
 //
-//  Created by 佰道聚合 on 2017/9/11.
+//  Created by cyd on 2017/9/11.
 //  Copyright © 2017年 cyd. All rights reserved.
 //
 
@@ -24,6 +24,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = @"Demo";
+    self.edgesForExtendedLayout = UIRectEdgeAll;
     
     [self.view addSubview:self.tableView];
 }
@@ -82,11 +83,12 @@
     if (!cell) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
         
-        CCTextField *textField = [[CCTextField alloc] initWithFrame:CGRectMake(0, 0, 180, 30)];
+        CCTextField *textField = [[CCTextField alloc] initWithFrame:CGRectMake(0, 0, 200, 30)];
         textField.layer.borderColor = [UIColor colorWithRed:100/225.0 green:100/225.0 blue:100/225.0 alpha:1].CGColor;
         textField.layer.borderWidth = 0.5;
         textField.delegate = self;
-        
+        textField.isTapEnd = YES;
+
         cell.accessoryView = textField;
         cell.textLabel.font = [UIFont systemFontOfSize:14];
         cell.textLabel.textColor = [UIColor colorWithRed:100/225.0 green:100/225.0 blue:100/225.0 alpha:1];
@@ -103,30 +105,34 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    [self.view endEditing:YES];
 }
 
--(BOOL)textFieldShouldReturn:(CCTextField *)textField{
-    [textField resignFirstResponder];
-    
+// iOS10
+-(void)textFieldDidEndEditing:(CCTextField *)textField reason:(UITextFieldDidEndEditingReason)reason
+{
     if (textField.checkState == CCTextStateEmpty) {
-        [self showAlert:@"输入内容为空"];
+        NSLog(@"输入内容为空");
     }
     else if (textField.checkState == CCTextStateNotInLimit) {
-        [self showAlert:[NSString stringWithFormat:@"输入内容必须在(%zd~%zd)字以内",textField.minLimit, textField.maxLimit]];
+        NSLog(@"输入内容必须在(%zd~%zd)字以内",textField.minLimit, textField.maxLimit);
     }
     else if (textField.checkState == CCTextStateNotRegular) {
-        [self showAlert:@"输入内容不合法"];
+        NSLog(@"输入内容不合法");
     }
-    
-    return YES;
 }
 
--(void)showAlert:(NSString *)message{
-    UIAlertController *vc = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *ok = [UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleCancel handler:nil];
-    [vc addAction:ok];
-    [self presentViewController:vc animated:YES completion:nil];
+// iOS10以下
+-(void)textFieldDidEndEditing:(CCTextField *)textField
+{
+    if (textField.checkState == CCTextStateEmpty) {
+        NSLog(@"输入内容为空");
+    }
+    else if (textField.checkState == CCTextStateNotInLimit) {
+        NSLog(@"输入内容必须在(%zd~%zd)字以内",textField.minLimit, textField.maxLimit);
+    }
+    else if (textField.checkState == CCTextStateNotRegular) {
+        NSLog(@"输入内容不合法");
+    }
 }
 
 - (void)didReceiveMemoryWarning {

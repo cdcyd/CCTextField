@@ -2,7 +2,7 @@
 //  AppDelegate.m
 //  CCTextField
 //
-//  Created by 佰道聚合 on 2017/9/11.
+//  Created by cyd on 2017/9/11.
 //  Copyright © 2017年 cyd. All rights reserved.
 //
 
@@ -18,7 +18,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     ViewController *vc = [[ViewController alloc] init];
-    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:vc];
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+    nav.view.backgroundColor = [UIColor whiteColor];
+    self.window.rootViewController = nav;
     return YES;
 }
 

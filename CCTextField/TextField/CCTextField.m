@@ -2,7 +2,7 @@
 //  CCTextField.m
 //  CCTextField
 //
-//  Created by 佰道聚合 on 2017/9/11.
+//  Created by cyd on 2017/9/11.
 //  Copyright © 2017年 cyd. All rights reserved.
 //
 
@@ -79,7 +79,7 @@
 // 帐号
 - (BOOL)isAccount
 {
-    NSString *tmpRegex = @"^[a-zA-Z][a-zA-Z0-9_]{6,18}$";
+    NSString *tmpRegex = @"^[a-zA-Z][a-zA-Z0-9_]{6,}$";
     NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
     return [tmpTest evaluateWithObject:self];
 }
@@ -87,7 +87,7 @@
 // 密码
 - (BOOL)isPassword
 {
-    NSString *tmpRegex = @"^[a-zA-Z]\\w{6,18}$";
+    NSString *tmpRegex = @"^[a-zA-Z]\\w{6,}$";
     NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
     return [tmpTest evaluateWithObject:self];
 }
@@ -95,7 +95,7 @@
 // 强密码
 - (BOOL)isStrongPassword
 {
-    NSString *tmpRegex = @"^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,18}$";
+    NSString *tmpRegex = @"^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$";
     NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
     return [tmpTest evaluateWithObject:self];
 }
@@ -178,12 +178,13 @@
 // 输入限制
 typedef NS_ENUM(NSInteger, CCLimitType){
     CCLimitNone             = 0,       // 全字符
-    CCLimitCHZN             = 1 << 0,  // 只能输入中文(用户在输入中文时，比先输入字母，所有如果仅有该限制，是什么也输不进去的)
-    CCLimitLetter           = 1 << 1,  // 只能输入字母(用户在输入中文时，会先输入字母，该限制只有在英文输入时才有效，如果用中文输入，还是可以输入中文的)
+    CCLimitCHZN             = 1 << 0,  // 只能输入中文(用户在输入中文时，会先输入字母，所有如果仅有该限制，就什么也输不进去了)
+    CCLimitLetter           = 1 << 1,  // 只能输入字母
     CCLimitNumber           = 1 << 2,  // 只能输入数字
     CCLimitPunctuation      = 1 << 3,  // 只能输入标点
     CCLimitSpecialCharacter = 1 << 4,  // 只能输入特殊字符(键盘上所有可见的特殊字符，包括标点符号)
     
+    // 下面这几个限制，在九宫格输入法时，就不能用了，所以... 它们都不能用，除非能确定用户不用九宫格输入
     CCLimitSpaces           = 1 << 5,  // 只能输入空格 ' '
     CCLimitComma            = 1 << 6,  // 只能输入逗号 ','
     CCLimitAnend            = 1 << 7,  // 只能输入句号 '.'
@@ -192,9 +193,11 @@ typedef NS_ENUM(NSInteger, CCLimitType){
 
 @interface CCTextField()<UITextFieldDelegate>
 
+@property(nonatomic, assign, readwrite)CCLimitType limit;
+
 @property(nonatomic, assign, readwrite)CCCheckState checkState;
 
-@property(nonatomic, assign, readwrite)CCLimitType limit;
+@property(nonatomic, strong, readwrite)UITapGestureRecognizer *tap;
 
 @end
 
@@ -206,10 +209,20 @@ typedef NS_ENUM(NSInteger, CCLimitType){
     self = [super initWithFrame:frame];
     if (self) {
         super.delegate = self;
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(textDidChanged:)
-                                                     name:UITextFieldTextDidChangeNotification
-                                                   object:self];
+        self.returnKeyType = UIReturnKeyDone;
+
+        self.isTapEnd = YES;
+        self.minLimit = 0;
+        self.maxLimit = INT_MAX;
+        
+        // 点击手势
+        self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(endEdited:)];
+        
+        // 禁止 undo/redo 功能，不然 textDidChanged 方法在做字数限制时，可能会crash
+        [UIApplication sharedApplication].applicationSupportsShakeToEdit = NO;
+        
+        [self addTarget:self action:@selector(textDidChanged:) forControlEvents:UIControlEventEditingChanged];
+        
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(keyboardWillChanged:)
                                                      name:UIKeyboardWillChangeFrameNotification
@@ -218,42 +231,78 @@ typedef NS_ENUM(NSInteger, CCLimitType){
     return self;
 }
 
--(void)setCheck:(CCCheckType)check
+-(void)dealloc
 {
-    _check = check;
+    [UIApplication sharedApplication].applicationSupportsShakeToEdit = YES;
     
-    if (check == CCCheckFloat) {
-        // 浮点数 只能输入 数字、小数点
-        self.limit = CCLimitNumber | CCLimitAnend;
-    }
-    else if (check == CCCheckIDCard) {
-        // 身份证 只能输入 数字、字母、最大18位
-        self.limit = CCLimitNumber | CCLimitLetter;
-        self.maxLimit = 18;
-    }
-    else if (check == CCCheckTel) {
-        // 电话 只能输入 数字、-
-        self.limit = CCLimitNumber | CCLimitMinusSign;
-    }
-    else if (check == CCCheckDate) {
-        // 日期 只能输入 数字、-
-        self.limit = CCLimitNumber | CCLimitMinusSign;
-    }
-    else if (check == CCCheckMoney) {
-        // 金额 只能输入 数字、小数点、逗号
-        self.limit = CCLimitNumber | CCLimitComma | CCLimitAnend;
-    }
-    else if (check == CCCheckPhone) {
-        // 手机 只能输入 数字、最大11位
-        self.limit = CCLimitNumber;
-        self.maxLimit = 11;
-    }
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillChangeFrameNotification object:nil];
 }
 
--(void)setMinLimit:(NSInteger)minLimit
+// 设置校验类型
+-(void)setCheck:(CCCheckType)check
 {
-    _minLimit = minLimit;
-    _maxLimit = _maxLimit > minLimit ? _maxLimit : minLimit;
+    // 在这里：1.确定键盘类型，2.输入类型限制，3.输入长度限制
+    _check = check;
+    self.secureTextEntry = NO;
+    
+    switch (check) {
+        case CCCheckNone:
+            break;
+        case CCCheckPassword:
+        case CCCheckStrongPassword:
+            // 密码 强密码
+            self.secureTextEntry = YES;
+            break;
+        case CCCheckAccount:
+            // 帐号
+            self.keyboardType = UIKeyboardTypeASCIICapable;
+            break;
+        case CCCheckDomain:
+            // 域名
+            self.keyboardType = UIKeyboardTypeASCIICapable;
+            break;
+        case CCCheckTel:
+            // 电话
+            self.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
+            self.limit = CCLimitNumber | CCLimitPunctuation;
+            break;
+        case CCCheckDate:
+            // 日期
+            self.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
+            self.limit = CCLimitNumber | CCLimitPunctuation;
+            break;
+        case CCCheckMoney:
+            // 金额
+            self.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
+            self.limit = CCLimitNumber | CCLimitPunctuation;
+            break;
+        case CCCheckIDCard:
+            // 身份证
+            self.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
+            self.limit = CCLimitNumber | CCLimitLetter;
+            self.maxLimit = 18;
+            break;
+        case CCCheckEmail:
+            // 邮箱
+            self.keyboardType = UIKeyboardTypeEmailAddress;
+            break;
+        case CCCheckPhone:
+            // 手机
+            self.keyboardType = UIKeyboardTypeNumberPad;
+            self.limit = CCLimitNumber;
+            self.maxLimit = 11;
+            break;
+        case CCCheckZipCode:
+            // 邮编
+            self.keyboardType = UIKeyboardTypeNumberPad;
+            self.limit = CCLimitNumber;
+            break;
+        case CCCheckFloat:
+            // 浮点数
+            self.keyboardType = UIKeyboardTypeDecimalPad;
+            self.limit = CCLimitNumber | CCLimitAnend;
+            break;
+    }
 }
 
 #pragma mark - delegate
@@ -305,107 +354,50 @@ typedef NS_ENUM(NSInteger, CCLimitType){
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
+    
+    // 1.自定义实现输入限制
     if ([_delegate respondsToSelector:@selector(textField:shouldChangeCharactersInRange:replacementString:)]) {
         return [_delegate textField:self shouldChangeCharactersInRange:range replacementString:string];
     }
-    return [self shouldChangeRange:range replacementString:string];
-}
-
-#pragma mark - notification
--(void)textDidChanged:(NSNotification *)notify{
-    // 空字符串
-    if (self.text.length <= 0) {
-        self.checkState = CCTextStateEmpty;
-        return ;
-    }
-    // 超出限制范围
-    if (self.maxLimit > 0 && (self.text.length < self.minLimit || self.text.length > self.maxLimit)) {
-        self.checkState = CCTextStateNotInLimit;
-        return ;
-    }
-    // 正则校验
-    if ((self.check == CCCheckTel   && ![self.text isTel])   ||
-        (self.check == CCCheckDate  && ![self.text isDate])  ||
-        (self.check == CCCheckEmail && ![self.text isEmail]) ||
-        (self.check == CCCheckFloat && ![self.text isFloat]) ||
-        (self.check == CCCheckMoney && ![self.text isMoney]) ||
-        (self.check == CCCheckPhone && ![self.text isPhone]) ||
-        (self.check == CCCheckDomain    && ![self.text isDomain])  ||
-        (self.check == CCCheckIDCard    && ![self.text isIDCard])  ||
-        (self.check == CCCheckAccount   && ![self.text isAccount]) ||
-        (self.check == CCCheckZipCode   && ![self.text isZipCode]) ||
-        (self.check == CCCheckPassword  && ![self.text isPassword])||
-        (self.check == CCCheckStrongPassword && ![self.text isStrongPassword])){
-        self.checkState = CCTextStateNotRegular;
-        return ;
-    }
-    self.checkState = CCTextStateNormal;
-}
-
-#pragma mark - private
--(BOOL)shouldChangeRange:(NSRange)range replacementString:(NSString *)string
-{
-    // 1.允许回车，不然return健收不了键盘：允许空字符串，不然删除健删除不了
+    
+    // 2.允许回车，不然回车健用不了；允许空字符串，不然删除健用不了
     if ([string isEqualToString:@"\n"] || [string isEqualToString:@""]){
         return YES;
     }
     
-    // 2.检查是否超过最大值
-    NSString *text = [self.text stringByReplacingCharactersInRange:range withString:string];
-    if (self.maxLimit > 0 && text.length > self.maxLimit) {
-        return NO;
+    // 3.字数限制(这里只做用户输入完成后的判断)
+    // * 如果没有选中文字，说明输入已完成，此时执行下面的限制判断
+    // * 如果有选中文字，说明正在输入，此时不能做限制，因为在中文输入时，必须先输入拼音，这样可能导致最后一个汉字不能输入，但是如果不做限制，用户可能一次输入很多字，导致超出输入限制，这种情况下，我们在 textDidChanged 方法中再做第二次字数限制
+    if (!self.markedTextRange) {
+        NSString *text = [self.text stringByReplacingCharactersInRange:range withString:string];
+        if (self.maxLimit > 0 && text.length > self.maxLimit) {
+            return NO;
+        }
     }
     
-    // 3.检查输入类型
-    if ((self.limit | CCLimitNone) == CCLimitNone) {
-        return YES;
+    // 4.检查输入类型
+    return [self suitableInput:string];
+}
+
+#pragma mark - Action
+-(void)endEdited:(UITapGestureRecognizer *)tap{
+    if (self.isTapEnd) {
+        [tap.view endEditing:YES];
     }
-    if ((self.limit & CCLimitCHZN) == CCLimitCHZN) {
-        if ([string isCHZN]) {
-            return YES;
-        }
+}
+
+-(void)textDidChanged:(UITextField *)textfield{
+    if (!self.isFirstResponder) return ;
+    
+    // 1.字数限制
+    NSString * tempString = textfield.text;
+    if (textfield.markedTextRange == nil && tempString.length > self.maxLimit && self.maxLimit > 0)
+    {
+        textfield.text = [tempString substringToIndex:self.maxLimit];
     }
-    if ((self.limit & CCLimitLetter) == CCLimitLetter) {
-        if ([string isLetter]) {
-            return YES;
-        }
-    }
-    if ((self.limit & CCLimitNumber) == CCLimitNumber) {
-        if ([string isNumber]) {
-            return YES;
-        }
-    }
-    if ((self.limit & CCLimitPunctuation) == CCLimitPunctuation) {
-        if ([string isPunctuation]) {
-            return YES;
-        }
-    }
-    if ((self.limit & CCLimitSpecialCharacter) == CCLimitSpecialCharacter) {
-        if ([string isSpecialCharacter]) {
-            return YES;
-        }
-    }
-    if ((self.limit & CCLimitSpaces) == CCLimitSpaces) {
-        if ([string isSpace]) {
-            return YES;
-        }
-    }
-    if ((self.limit & CCLimitComma) == CCLimitComma) {
-        if ([string isComma]) {
-            return YES;
-        }
-    }
-    if ((self.limit & CCLimitAnend) == CCLimitAnend) {
-        if ([string isAnend]) {
-            return YES;
-        }
-    }
-    if ((self.limit & CCLimitMinusSign) == CCLimitMinusSign) {
-        if ([string isMinusSign]) {
-            return YES;
-        }
-    }
-    return NO;
+    
+    // 2.更新正则校验状态
+    [self updateCheckState];
 }
 
 #pragma mark - Keyboard
@@ -432,18 +424,119 @@ typedef NS_ENUM(NSInteger, CCLimitType){
     UIView *animationView = [self viewController].view;
     if (!animationView) animationView = window;
     
+    // 点击手势
+    for (UITapGestureRecognizer *tap in window.rootViewController.view.gestureRecognizers) {
+        [window.rootViewController.view removeGestureRecognizer:tap];
+    }
+    
     if (minY >= CGRectGetMaxY(window.frame)) {
+        // 收键盘
         [UIView animateWithDuration:durationValue delay:0.0 options:optionValue animations:^{
             animationView.transform = CGAffineTransformIdentity;
         } completion:nil];
     }
     else if (offsetY < 0){
+        // 弹出键盘，需要移动输入框
+        [window.rootViewController.view addGestureRecognizer:self.tap];
+        
         [UIView animateWithDuration:durationValue delay:0.0 options:optionValue animations:^{
             animationView.transform = CGAffineTransformTranslate(animationView.transform, 0, offsetY);
         } completion:nil];
     }
+    else{
+        // 弹出键盘，不需要移动输入框
+        [window.rootViewController.view addGestureRecognizer:self.tap];
+    }
 }
 
+#pragma mark - private
+// 更新正则校验状态
+-(void)updateCheckState
+{
+    // 1.空字符串
+    if (self.text.length <= 0) {
+        self.checkState = CCTextStateEmpty;
+        return ;
+    }
+    // 2.超出限制范围
+    if (self.maxLimit > 0 && (self.text.length < self.minLimit || self.text.length > self.maxLimit)) {
+        self.checkState = CCTextStateNotInLimit;
+        return ;
+    }
+    // 3.正则校验
+    if ((self.check == CCCheckTel   && ![self.text isTel])   ||
+        (self.check == CCCheckDate  && ![self.text isDate])  ||
+        (self.check == CCCheckEmail && ![self.text isEmail]) ||
+        (self.check == CCCheckFloat && ![self.text isFloat]) ||
+        (self.check == CCCheckMoney && ![self.text isMoney]) ||
+        (self.check == CCCheckPhone && ![self.text isPhone]) ||
+        (self.check == CCCheckDomain    && ![self.text isDomain])  ||
+        (self.check == CCCheckIDCard    && ![self.text isIDCard])  ||
+        (self.check == CCCheckAccount   && ![self.text isAccount]) ||
+        (self.check == CCCheckZipCode   && ![self.text isZipCode]) ||
+        (self.check == CCCheckPassword  && ![self.text isPassword])||
+        (self.check == CCCheckStrongPassword && ![self.text isStrongPassword])){
+        self.checkState = CCTextStateNotRegular;
+        return ;
+    }
+    self.checkState = CCTextStateNormal;
+}
+
+// 是否允许输入
+-(BOOL)suitableInput:(NSString *)text
+{
+    if (self.limit == CCLimitNone) {
+        return YES;
+    }
+    if ((self.limit & CCLimitCHZN) == CCLimitCHZN) {
+        if ([text isCHZN]) {
+            return YES;
+        }
+    }
+    if ((self.limit & CCLimitComma) == CCLimitComma) {
+        if ([text isComma]) {
+            return YES;
+        }
+    }
+    if ((self.limit & CCLimitAnend) == CCLimitAnend) {
+        if ([text isAnend]) {
+            return YES;
+        }
+    }
+    if ((self.limit & CCLimitLetter) == CCLimitLetter) {
+        if ([text isLetter]) {
+            return YES;
+        }
+    }
+    if ((self.limit & CCLimitNumber) == CCLimitNumber) {
+        if ([text isNumber]) {
+            return YES;
+        }
+    }
+    if ((self.limit & CCLimitSpaces) == CCLimitSpaces) {
+        if ([text isSpace]) {
+            return YES;
+        }
+    }
+    if ((self.limit & CCLimitMinusSign) == CCLimitMinusSign) {
+        if ([text isMinusSign]) {
+            return YES;
+        }
+    }
+    if ((self.limit & CCLimitPunctuation) == CCLimitPunctuation) {
+        if ([text isPunctuation]) {
+            return YES;
+        }
+    }
+    if ((self.limit & CCLimitSpecialCharacter) == CCLimitSpecialCharacter) {
+        if ([text isSpecialCharacter]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+// 获取view的vc
 - (UIViewController *)viewController
 {
     if ([[self nextResponder] isKindOfClass:[UIViewController class]]) {
