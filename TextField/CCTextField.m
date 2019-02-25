@@ -145,7 +145,7 @@ typedef NS_ENUM(NSInteger, CCLimitType){
 }
 
 #pragma mark - delegate
-- (void)textFieldDidBeginEditing:(UITextField *)textField{
+- (void)textFieldDidBeginEditing:(UITextField *)textField {
     if ([_delegate respondsToSelector:@selector(textFieldDidBeginEditing:)]) {
         [_delegate textFieldDidBeginEditing:self];
     }
@@ -157,7 +157,7 @@ typedef NS_ENUM(NSInteger, CCLimitType){
     }
 }
 
-- (void)textFieldDidEndEditing:(UITextField *)textField reason:(UITextFieldDidEndEditingReason)reason{
+- (void)textFieldDidEndEditing:(UITextField *)textField reason:(UITextFieldDidEndEditingReason)reason NS_AVAILABLE_IOS(10_0) {
     if ([_delegate respondsToSelector:@selector(textFieldDidEndEditing:reason:)]) {
         [_delegate textFieldDidEndEditing:self reason:reason];
     }
