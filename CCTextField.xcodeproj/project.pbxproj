@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D85EBCD2223DBEA009989D0 /* NSString+CCRegular.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D85EBCC2223DBEA009989D0 /* NSString+CCRegular.m */; };
 		D91349A91F67CC5C004154BA /* CCTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = D91349A81F67CC5C004154BA /* CCTextField.m */; };
 		D95DB8D11F668C9800D58183 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D95DB8D01F668C9800D58183 /* main.m */; };
 		D95DB8D41F668C9800D58183 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D95DB8D31F668C9800D58183 /* AppDelegate.m */; };
@@ -17,6 +18,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0D85EBCB2223DBEA009989D0 /* NSString+CCRegular.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+CCRegular.h"; sourceTree = "<group>"; };
+		0D85EBCC2223DBEA009989D0 /* NSString+CCRegular.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+CCRegular.m"; sourceTree = "<group>"; };
 		D91349A71F67CC5C004154BA /* CCTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCTextField.h; sourceTree = "<group>"; };
 		D91349A81F67CC5C004154BA /* CCTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCTextField.m; sourceTree = "<group>"; };
 		D95DB8CC1F668C9800D58183 /* CCTextField.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CCTextField.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -47,6 +50,8 @@
 			children = (
 				D91349A71F67CC5C004154BA /* CCTextField.h */,
 				D91349A81F67CC5C004154BA /* CCTextField.m */,
+				0D85EBCB2223DBEA009989D0 /* NSString+CCRegular.h */,
+				0D85EBCC2223DBEA009989D0 /* NSString+CCRegular.m */,
 			);
 			path = TextField;
 			sourceTree = SOURCE_ROOT;
@@ -118,7 +123,7 @@
 		D95DB8C41F668C9800D58183 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 1010;
 				ORGANIZATIONNAME = cyd;
 				TargetAttributes = {
 					D95DB8CB1F668C9800D58183 = {
@@ -165,6 +170,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D95DB8D71F668C9800D58183 /* ViewController.m in Sources */,
+				0D85EBCD2223DBEA009989D0 /* NSString+CCRegular.m in Sources */,
 				D95DB8D41F668C9800D58183 /* AppDelegate.m in Sources */,
 				D95DB8D11F668C9800D58183 /* main.m in Sources */,
 				D91349A91F67CC5C004154BA /* CCTextField.m in Sources */,
@@ -207,6 +213,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -214,6 +221,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -261,6 +269,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -268,6 +277,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

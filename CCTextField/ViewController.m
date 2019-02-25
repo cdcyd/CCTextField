@@ -25,13 +25,12 @@
     [super viewDidLoad];
     self.title = @"Demo";
     self.edgesForExtendedLayout = UIRectEdgeAll;
-    
     [self.view addSubview:self.tableView];
 }
 
 -(UITableView *)tableView{
     if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:self.view.bounds style:UITableViewStylePlain];
+        _tableView = [[UITableView alloc]initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
         _tableView.delegate   = self;
         _tableView.dataSource = self;
         _tableView.backgroundColor = [UIColor whiteColor];
@@ -57,19 +56,10 @@
              @{@"座机":@(CCCheckTel)}];
 }
 
+#pragma mark - TableView
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return 50;
-}
-
--(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
-{
-    UITableViewHeaderFooterView *view = [tableView dequeueReusableHeaderFooterViewWithIdentifier:@"header"];
-    if (!view) {
-        view = [[UITableViewHeaderFooterView alloc] initWithReuseIdentifier:@"header"];
-        view.contentView.backgroundColor = [UIColor colorWithRed:210/225.0 green:210/225.0 blue:210/225.0 alpha:1];
-    }
-    return view;
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -107,16 +97,15 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
-// iOS10
+#pragma mark - CCTextFieldDelegate
+// iOS10及以上
 -(void)textFieldDidEndEditing:(CCTextField *)textField reason:(UITextFieldDidEndEditingReason)reason
 {
     if (textField.checkState == CCTextStateEmpty) {
         NSLog(@"输入内容为空");
-    }
-    else if (textField.checkState == CCTextStateNotInLimit) {
+    } else if (textField.checkState == CCTextStateNotInLimit) {
         NSLog(@"输入内容必须在(%zd~%zd)字以内",textField.minLimit, textField.maxLimit);
-    }
-    else if (textField.checkState == CCTextStateNotRegular) {
+    } else if (textField.checkState == CCTextStateNotRegular) {
         NSLog(@"输入内容不合法");
     }
 }
@@ -126,11 +115,9 @@
 {
     if (textField.checkState == CCTextStateEmpty) {
         NSLog(@"输入内容为空");
-    }
-    else if (textField.checkState == CCTextStateNotInLimit) {
+    } else if (textField.checkState == CCTextStateNotInLimit) {
         NSLog(@"输入内容必须在(%zd~%zd)字以内",textField.minLimit, textField.maxLimit);
-    }
-    else if (textField.checkState == CCTextStateNotRegular) {
+    } else if (textField.checkState == CCTextStateNotRegular) {
         NSLog(@"输入内容不合法");
     }
 }

@@ -7,173 +7,7 @@
 //
 
 #import "CCTextField.h"
-
-@implementation NSString (CCValidate)
-
-#pragma mark - 输入限制
-// 数字
-- (BOOL)isNumber
-{
-    NSString *tmpRegex = @"^[0-9]+$";
-    NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
-    return [tmpTest evaluateWithObject:self];
-}
-
-// 字母
-- (BOOL)isLetter
-{
-    NSString *tmpRegex = @"^[A-Za-z]+$";
-    NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
-    return [tmpTest evaluateWithObject:self];
-}
-
-// 中文
-- (BOOL)isCHZN
-{
-    NSString *tmpRegex = @"^[\\u4e00-\\u9fa5]+$";
-    NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
-    return [tmpTest evaluateWithObject:self];
-}
-
-// 标点符号
-- (BOOL)isPunctuation
-{
-    NSString *tmpRegex = @"^[[:punct:]]+$";
-    NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
-    return [tmpTest evaluateWithObject:self];
-}
-
-// 特殊字符(键盘上所有可见的特殊字符，包括标点符号)
-- (BOOL)isSpecialCharacter
-{
-    NSString *tmpRegex = @"((?=[\x21-\x7e]+)[^A-Za-z0-9])+$";
-    NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
-    return [tmpTest evaluateWithObject:self];
-}
-
-// 空格
-- (BOOL)isSpace
-{
-    return [self isEqualToString:@" "];
-}
-
-// -
-- (BOOL)isMinusSign
-{
-    return [self isEqualToString:@"-"];
-}
-
-// ,
-- (BOOL)isComma
-{
-    return [self isEqualToString:@","];
-}
-
-// .
-- (BOOL)isAnend
-{
-    return [self isEqualToString:@"."];
-}
-
-#pragma mark - 输入校验
-// 帐号
-- (BOOL)isAccount
-{
-    NSString *tmpRegex = @"^[a-zA-Z][a-zA-Z0-9_]{6,}$";
-    NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
-    return [tmpTest evaluateWithObject:self];
-}
-
-// 密码
-- (BOOL)isPassword
-{
-    NSString *tmpRegex = @"^[a-zA-Z]\\w{6,}$";
-    NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
-    return [tmpTest evaluateWithObject:self];
-}
-
-// 强密码
-- (BOOL)isStrongPassword
-{
-    NSString *tmpRegex = @"^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$";
-    NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
-    return [tmpTest evaluateWithObject:self];
-}
-
-// 邮箱
-- (BOOL)isEmail
-{
-    NSString *tmpRegex = @"^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$";
-    NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
-    return [tmpTest evaluateWithObject:self];
-}
-
-// 邮编
-- (BOOL)isZipCode
-{
-    NSString *tmpRegex = @"[1-9]\\d{5}(?!\\d)";
-    NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
-    return [tmpTest evaluateWithObject:self];
-}
-
-// 域名
-- (BOOL)isDomain
-{
-    NSString *reg = @"[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(/.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+/.?";
-    NSPredicate *regextestmm = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", reg];
-    return [regextestmm evaluateWithObject:self];
-}
-
-// 浮点数
-- (BOOL)isFloat{
-    NSString *tmpRegex = @"^(([0-9]+\\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\\.[0-9]+)|([0-9]*[1-9][0-9]*))$";
-    NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
-    return [tmpTest evaluateWithObject:self];
-}
-
-// 日期
-- (BOOL)isDate
-{
-    NSString *tmpRegex = @"\\d{4}-(0?[1-9]|1[0-2])-((0?[1-9])|((1|2)[0-9])|30|31)";
-    NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
-    return [tmpTest evaluateWithObject:self];
-}
-
-// 电话
-- (BOOL)isTel
-{
-    NSString *tmpRegex = @"^((\\(\\d{2,3}\\))|(\\d{3}\\-))?(\\(0\\d{2,3}\\)|0\\d{2,3}-)?[1-9]\\d{6,7}(\\-\\d{1,4})?$";
-    NSPredicate *tmpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", tmpRegex];
-    return [tmpTest evaluateWithObject:self];
-}
-
-// 手机
-- (BOOL)isPhone
-{
-    if (self.length != 11){ return NO; }
-    NSString *MOBILE = @"^1(3[0-9]|4[57]|5[0-35-9]|8[0-9]|7[0678])\\d{8}$";
-    NSPredicate *regextestmm = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", MOBILE];
-    return [regextestmm evaluateWithObject:self];
-}
-
-// 身份证
-- (BOOL)isIDCard
-{
-    if (self.length != 18){ return NO; }
-    NSString *reg = @"^(^[1-9]\\d{7}((0\\d)|(1[0-2]))(([0|1|2]\\d)|3[0-1])\\d{3}$)|(^[1-9]\\d{5}[1-9]\\d{3}((0\\d)|(1[0-2]))(([0|1|2]\\d)|3[0-1])((\\d{4})|\\d{3}[Xx])$)";
-    NSPredicate *regextestmm = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", reg];
-    return [regextestmm evaluateWithObject:self];
-}
-
-// 金额
-- (BOOL)isMoney
-{
-    NSString *reg = @"^([0-9]+|[0-9]{1,3}(,[0-9]{3})*)(.[0-9]{1,2})?$";
-    NSPredicate *regextestmm = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", reg];
-    return [regextestmm evaluateWithObject:self];
-}
-
-@end
+#import "NSString+CCRegular.h"
 
 // 输入限制
 typedef NS_ENUM(NSInteger, CCLimitType){
@@ -182,12 +16,12 @@ typedef NS_ENUM(NSInteger, CCLimitType){
     CCLimitLetter           = 1 << 1,  // 只能输入字母
     CCLimitNumber           = 1 << 2,  // 只能输入数字
     CCLimitPunctuation      = 1 << 3,  // 只能输入标点
-    CCLimitSpecialCharacter = 1 << 4,  // 只能输入特殊字符(键盘上所有可见的特殊字符，包括标点符号)
+    CCLimitSpecialCharacter = 1 << 4,  // 只能输入特殊字符
     
     // 下面这几个限制，在九宫格输入法时，就不能用了，所以... 它们都不能用，除非能确定用户不用九宫格输入
-    CCLimitSpaces           = 1 << 5,  // 只能输入空格 ' '
-    CCLimitComma            = 1 << 6,  // 只能输入逗号 ','
-    CCLimitAnend            = 1 << 7,  // 只能输入句号 '.'
+    CCLimitComma            = 1 << 5,  // 只能输入逗号 ','
+    CCLimitAnend            = 1 << 6,  // 只能输入句号 '.'
+    CCLimitSpaces           = 1 << 7,  // 只能输入空格 ' '
     CCLimitMinusSign        = 1 << 8,  // 只能输入负号 '-'
 };
 
@@ -210,19 +44,20 @@ typedef NS_ENUM(NSInteger, CCLimitType){
     if (self) {
         super.delegate = self;
         self.returnKeyType = UIReturnKeyDone;
-
         self.isTapEnd = YES;
         self.minLimit = 0;
         self.maxLimit = INT_MAX;
         
         // 点击手势
         self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(endEdited:)];
-        
+
+        // 结束编辑事件
+        [self addTarget:self action:@selector(textDidChanged:) forControlEvents:UIControlEventEditingChanged];
+
         // 禁止 undo/redo 功能，不然 textDidChanged 方法在做字数限制时，可能会crash
         [UIApplication sharedApplication].applicationSupportsShakeToEdit = NO;
-        
-        [self addTarget:self action:@selector(textDidChanged:) forControlEvents:UIControlEventEditingChanged];
-        
+
+        // 键盘监听
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(keyboardWillChanged:)
                                                      name:UIKeyboardWillChangeFrameNotification
@@ -234,74 +69,78 @@ typedef NS_ENUM(NSInteger, CCLimitType){
 -(void)dealloc
 {
     [UIApplication sharedApplication].applicationSupportsShakeToEdit = YES;
-    
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillChangeFrameNotification object:nil];
 }
 
 // 设置校验类型
 -(void)setCheck:(CCCheckType)check
 {
-    // 在这里：1.确定键盘类型，2.输入类型限制，3.输入长度限制
     _check = check;
+
+    // 限制初始化
+    self.minLimit = 0;
+    self.maxLimit = INT_MAX;
+    self.limit = CCLimitNone;
     self.secureTextEntry = NO;
+    self.keyboardType = UIKeyboardTypeDefault;
     
     switch (check) {
-        case CCCheckNone:
-            break;
         case CCCheckPassword:
         case CCCheckStrongPassword:
             // 密码 强密码
             self.secureTextEntry = YES;
+            self.keyboardType = UIKeyboardTypeASCIICapable;
             break;
         case CCCheckAccount:
             // 帐号
             self.keyboardType = UIKeyboardTypeASCIICapable;
             break;
-        case CCCheckDomain:
-            // 域名
-            self.keyboardType = UIKeyboardTypeASCIICapable;
-            break;
-        case CCCheckTel:
-            // 电话
-            self.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
-            self.limit = CCLimitNumber | CCLimitPunctuation;
-            break;
-        case CCCheckDate:
-            // 日期
-            self.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
-            self.limit = CCLimitNumber | CCLimitPunctuation;
-            break;
-        case CCCheckMoney:
-            // 金额
-            self.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
-            self.limit = CCLimitNumber | CCLimitPunctuation;
-            break;
-        case CCCheckIDCard:
-            // 身份证
-            self.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
-            self.limit = CCLimitNumber | CCLimitLetter;
-            self.maxLimit = 18;
-            break;
         case CCCheckEmail:
             // 邮箱
             self.keyboardType = UIKeyboardTypeEmailAddress;
             break;
-        case CCCheckPhone:
-            // 手机
-            self.keyboardType = UIKeyboardTypeNumberPad;
-            self.limit = CCLimitNumber;
-            self.maxLimit = 11;
+        case CCCheckDomain:
+            // 域名
+            self.keyboardType = UIKeyboardTypeASCIICapable;
             break;
         case CCCheckZipCode:
             // 邮编
-            self.keyboardType = UIKeyboardTypeNumberPad;
             self.limit = CCLimitNumber;
+            self.keyboardType = UIKeyboardTypeNumberPad;
+            break;
+        case CCCheckTel:
+            // 电话
+            self.limit = CCLimitNumber | CCLimitPunctuation;
+            self.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
+            break;
+        case CCCheckDate:
+            // 日期
+            self.limit = CCLimitNumber | CCLimitPunctuation;
+            self.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
+            break;
+        case CCCheckMoney:
+            // 金额
+            self.limit = CCLimitNumber | CCLimitPunctuation;
+            self.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
             break;
         case CCCheckFloat:
             // 浮点数
-            self.keyboardType = UIKeyboardTypeDecimalPad;
             self.limit = CCLimitNumber | CCLimitAnend;
+            self.keyboardType = UIKeyboardTypeDecimalPad;
             break;
+        case CCCheckIDCard:
+            // 身份证
+            self.maxLimit = 18;
+            self.limit = CCLimitNumber | CCLimitLetter;
+            self.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
+            break;
+        case CCCheckPhone:
+            // 手机
+            self.maxLimit = 11;
+            self.limit = CCLimitNumber;
+            self.keyboardType = UIKeyboardTypeNumberPad;
+            break;
+        default: break;
     }
 }
 
@@ -434,16 +273,14 @@ typedef NS_ENUM(NSInteger, CCLimitType){
         [UIView animateWithDuration:durationValue delay:0.0 options:optionValue animations:^{
             animationView.transform = CGAffineTransformIdentity;
         } completion:nil];
-    }
-    else if (offsetY < 0){
+    } else if (offsetY < 0){
         // 弹出键盘，需要移动输入框
         [window.rootViewController.view addGestureRecognizer:self.tap];
         
         [UIView animateWithDuration:durationValue delay:0.0 options:optionValue animations:^{
             animationView.transform = CGAffineTransformTranslate(animationView.transform, 0, offsetY);
         } completion:nil];
-    }
-    else{
+    } else {
         // 弹出键盘，不需要移动输入框
         [window.rootViewController.view addGestureRecognizer:self.tap];
     }
@@ -456,28 +293,28 @@ typedef NS_ENUM(NSInteger, CCLimitType){
     // 1.空字符串
     if (self.text.length <= 0) {
         self.checkState = CCTextStateEmpty;
-        return ;
+        return;
     }
     // 2.超出限制范围
     if (self.maxLimit > 0 && (self.text.length < self.minLimit || self.text.length > self.maxLimit)) {
         self.checkState = CCTextStateNotInLimit;
-        return ;
+        return;
     }
     // 3.正则校验
-    if ((self.check == CCCheckTel   && ![self.text isTel])   ||
-        (self.check == CCCheckDate  && ![self.text isDate])  ||
-        (self.check == CCCheckEmail && ![self.text isEmail]) ||
-        (self.check == CCCheckFloat && ![self.text isFloat]) ||
-        (self.check == CCCheckMoney && ![self.text isMoney]) ||
-        (self.check == CCCheckPhone && ![self.text isPhone]) ||
-        (self.check == CCCheckDomain    && ![self.text isDomain])  ||
-        (self.check == CCCheckIDCard    && ![self.text isIDCard])  ||
-        (self.check == CCCheckAccount   && ![self.text isAccount]) ||
-        (self.check == CCCheckZipCode   && ![self.text isZipCode]) ||
-        (self.check == CCCheckPassword  && ![self.text isPassword])||
+    if ((self.check == CCCheckTel            && ![self.text isTel])          ||
+        (self.check == CCCheckDate           && ![self.text isDate])         ||
+        (self.check == CCCheckEmail          && ![self.text isEmail])        ||
+        (self.check == CCCheckFloat          && ![self.text isFloat])        ||
+        (self.check == CCCheckMoney          && ![self.text isMoney])        ||
+        (self.check == CCCheckPhone          && ![self.text isPhone])        ||
+        (self.check == CCCheckDomain         && ![self.text isDomain])       ||
+        (self.check == CCCheckIDCard         && ![self.text isIDCard])       ||
+        (self.check == CCCheckAccount        && ![self.text isAccount])      ||
+        (self.check == CCCheckZipCode        && ![self.text isZipCode])      ||
+        (self.check == CCCheckPassword       && ![self.text isPassword])     ||
         (self.check == CCCheckStrongPassword && ![self.text isStrongPassword])){
         self.checkState = CCTextStateNotRegular;
-        return ;
+        return;
     }
     self.checkState = CCTextStateNormal;
 }
@@ -542,7 +379,6 @@ typedef NS_ENUM(NSInteger, CCLimitType){
     if ([[self nextResponder] isKindOfClass:[UIViewController class]]) {
         return (UIViewController *)[self nextResponder];
     }
-    
     for (UIView* next = [self superview]; next; next = next.superview){
         UIResponder *nextResponder = [next nextResponder];
         if ([nextResponder isKindOfClass:[UIViewController class]]){
